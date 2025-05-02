@@ -1,0 +1,51 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <h1 class="mb-4">Latest Blog Posts</h1>
+
+    <!-- Category Filter Dropdown -->
+    <form method="get" class="mb-4">
+        <div class="form-group">
+            <label for="categorySelect"><strong>Filter by Category:</strong></label>
+            <select id="categorySelect" class="form-control" onchange="location = this.value;">
+                <option value="{% url 'blog-home' %}">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{% url 'category-posts' cat.id %}"
+                        {% if selected_category and selected_category.id == cat.id %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <!-- Blog Posts -->
+    {% for post in posts %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h4 class="card-title">
+                    <a href="{% url 'post-detail' post.pk %}" class="text-decoration-none">{{ post.title }}</a>
+                </h4>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    By {{ post.author }} on {{ post.date_posted }}
+                </h6>
+
+                <p>
+                    <strong>Category:</strong>
+                    {% if post.category %}
+                        <a href="{% url 'category-posts' post.category.id %}">
+                            {{ post.category.name }}
+                        </a>
+                    {% else %}
+                        Uncategorized
+                    {% endif %}
+                </p>
+
+                <p class="card-text">{{ post.content|truncatechars:200 }}</p>
+                <a href="{% url 'post-detail' post.pk %}" class="btn btn-primary">Read More</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>No blog posts found in this category.</p>
+    {% endfor %}
+{% endblock %}
